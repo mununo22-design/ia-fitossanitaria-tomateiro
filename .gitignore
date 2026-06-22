@@ -1,0 +1,29 @@
+# Ambiente virtual
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Arquivos temporários
+*.tmp
+*.log
+
+# Dados brutos grandes, caso existam
+data_raw/
+outputs_temp/

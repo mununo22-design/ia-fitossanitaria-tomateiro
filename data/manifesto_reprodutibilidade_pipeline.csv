@@ -1,0 +1,12 @@
+﻿field,value
+base_dir,/content/drive/MyDrive/eppo_hortalicas
+raw_eppo_dir,/content/drive/MyDrive/eppo_hortalicas/data_raw/eppo
+raw_faostat_dir,/content/drive/MyDrive/eppo_hortalicas/data_raw/faostat
+faostat_file_used,/content/drive/MyDrive/eppo_hortalicas/data_raw/faostat/Production_Crops_Livestock_E_All_Data_(Normalized).csv
+target_crop,tomato
+target_fao_item,Tomatoes
+main_index,IEFP-T
+main_index_formula,presence_weight * regulatory_weight * pathogen_pressure_score * tomato_importance_score
+sensitivity_formula,presence_weight * regulatory_weight * pathogen_pressure_score * tomato_importance_score_log
+faostat_recent_period_start,2020
+faostat_recent_period_end,2024
