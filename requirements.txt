@@ -5,8 +5,4 @@ plotly
 matplotlib
 seaborn
 scikit-learn
-scipy
-xgboost==1.7.6
-shap==0.41.0
-joblib
-openpyxl
+xgboost

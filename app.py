@@ -32,9 +32,9 @@ import scipy.stats as stats
 # ============================================================
 
 st.set_page_config(
-page_title="IA Aplicada à Vigilância Fitossanitária do Tomateiro",
-page_icon="🍅",
-layout="wide"
+    page_title="IA Aplicada à Vigilância Fitossanitária do Tomateiro",
+    page_icon="🍅",
+    layout="wide"
 )
 
 # ============================================================
@@ -44,18 +44,18 @@ layout="wide"
 # ============================================================
 
 def verificar_bibliotecas():
-libs = ["streamlit","pandas","numpy","plotly","matplotlib","seaborn","sklearn","scipy"]
-status = []
-for lib in libs:
-if importlib.util.find_spec(lib):
-status.append(f"OK - {lib}")
-else:
-status.append(f"FALTANDO - {lib}")
-return status
+    libs = ["streamlit","pandas","numpy","plotly","matplotlib","seaborn","sklearn","scipy"]
+    status = []
+    for lib in libs:
+        if importlib.util.find_spec(lib):
+            status.append(f"OK - {lib}")
+        else:
+            status.append(f"FALTANDO - {lib}")
+    return status
 
 with st.sidebar.expander("✅ Ambiente Python"):
-for s in verificar_bibliotecas():
-st.write(s)
+    for s in verificar_bibliotecas():
+        st.write(s)
 
 st.sidebar.title("Filtros")
 pais_selecionado = st.sidebar.text_input("Filtrar país")
@@ -70,13 +70,17 @@ DATA_PATH = Path("data")
 
 @st.cache_data
 def carregar_dados():
-df = pd.read_csv(DATA_PATH / "base_analitica_paises_tomateiro.csv")
-return df
+    try:
+        df = pd.read_csv(DATA_PATH / "base_analitica_paises_tomateiro.csv")
+        return df
+    except Exception as e:
+        st.error(f"Erro ao carregar dados: {e}")
+        st.stop()
 
 df = carregar_dados()
 
 if pais_selecionado:
-df = df[df["pais"].str.contains(pais_selecionado, case=False)]
+    df = df[df["pais"].str.contains(pais_selecionado, case=False)]
 
 # ============================================================
 
@@ -86,7 +90,7 @@ df = df[df["pais"].str.contains(pais_selecionado, case=False)]
 
 scaler = MinMaxScaler()
 df[["producao_ton", "num_patogenos"]] = scaler.fit_transform(
-df[["producao_ton", "num_patogenos"]]
+    df[["producao_ton", "num_patogenos"]]
 )
 
 df["iefp_normalizado"] = df["producao_ton"] * df["num_patogenos"]
@@ -142,10 +146,10 @@ col3.metric("IEFP médio", round(df["iefp"].mean(), 3))
 
 mean_iefp = df["iefp"].mean()
 conf = stats.t.interval(
-0.95,
-len(df["iefp"]) - 1,
-loc=mean_iefp,
-scale=stats.sem(df["iefp"])
+    0.95,
+    len(df["iefp"]) - 1,
+    loc=mean_iefp,
+    scale=stats.sem(df["iefp"])
 )
 
 st.write(f"Intervalo de Confiança (95%): {conf}")
@@ -157,12 +161,12 @@ st.write(f"Intervalo de Confiança (95%): {conf}")
 # ============================================================
 
 fig = px.scatter(
-df,
-x="producao_ton",
-y="num_patogenos",
-size="iefp",
-color="classe_exposicao",
-hover_name="pais"
+    df,
+    x="producao_ton",
+    y="num_patogenos",
+    size="iefp",
+    color="classe_exposicao",
+    hover_name="pais"
 )
 
 st.plotly_chart(fig, use_container_width=True)
@@ -187,14 +191,14 @@ st.plotly_chart(fig2, use_container_width=True)
 # ============================================================
 
 if "iso3" in df.columns:
-fig_map = px.choropleth(
-df,
-locations="iso3",
-color="iefp",
-hover_name="pais",
-color_continuous_scale="Reds"
-)
-st.plotly_chart(fig_map, use_container_width=True)
+    fig_map = px.choropleth(
+        df,
+        locations="iso3",
+        color="iefp",
+        hover_name="pais",
+        color_continuous_scale="Reds"
+    )
+    st.plotly_chart(fig_map, use_container_width=True)
 
 # ============================================================
 
@@ -216,40 +220,36 @@ st.header("🤖 Modelos de Classificação")
 
 if "classe_exposicao" in df.columns:
 
-```
-X = df[["producao_ton", "num_patogenos", "iefp"]]
-y = LabelEncoder().fit_transform(df["classe_exposicao"])
+    X = df[["producao_ton", "num_patogenos", "iefp"]]
+    y = LabelEncoder().fit_transform(df["classe_exposicao"])
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-# SVM
-svm = SVC()
-svm.fit(X_train, y_train)
-pred_svm = svm.predict(X_test)
-acc_svm = accuracy_score(y_test, pred_svm)
+    # SVM
+    svm = SVC()
+    svm.fit(X_train, y_train)
+    pred_svm = svm.predict(X_test)
+    acc_svm = accuracy_score(y_test, pred_svm)
 
-# KNN
-knn = KNeighborsClassifier(n_neighbors=5)
-knn.fit(X_train, y_train)
-pred_knn = knn.predict(X_test)
-acc_knn = accuracy_score(y_test, pred_knn)
+    # KNN
+    knn = KNeighborsClassifier(n_neighbors=5)
+    knn.fit(X_train, y_train)
+    pred_knn = knn.predict(X_test)
+    acc_knn = accuracy_score(y_test, pred_knn)
 
-col1, col2 = st.columns(2)
-col1.metric("Acurácia SVM", round(acc_svm, 2))
-col2.metric("Acurácia KNN", round(acc_knn, 2))
+    col1, col2 = st.columns(2)
+    col1.metric("Acurácia SVM", round(acc_svm, 2))
+    col2.metric("Acurácia KNN", round(acc_knn, 2))
 
-# MATRIZ DE CONFUSÃO
-cm = confusion_matrix(y_test, pred_svm)
+    # MATRIZ DE CONFUSÃO
+    cm = confusion_matrix(y_test, pred_svm)
 
-fig_cm, ax = plt.subplots()
-sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax)
-st.pyplot(fig_cm)
-```
+    fig_cm, ax = plt.subplots()
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax)
+    st.pyplot(fig_cm)
 
 # ============================================================
-
 # DISCUSSÃO
-
 # ============================================================
 
 st.header("📚 Discussão Científica")
@@ -263,9 +263,7 @@ A ausência de dados indica fragilidade nos sistemas de vigilância.
 """)
 
 # ============================================================
-
 # RODAPÉ
-
 # ============================================================
 
 st.markdown("---")
@@ -275,6 +273,6 @@ Paulo Mununu João Pedro
 Engenheiro Agrónomo | Mestrando em Agroquímica
 Instituto Federal Goiano — Campus Rio Verde
 Lattes: http://lattes.cnpq.br/0856915480190039
-LinkedIn: [www.linkedin.com/in/paulopedro2](http://www.linkedin.com/in/paulopedro2)
-E-mail: [mununo22@live.com.pt](mailto:mununo22@live.com.pt)
+LinkedIn: www.linkedin.com/in/paulopedro2
+E-mail: mununo22@live.com.pt
 """)
